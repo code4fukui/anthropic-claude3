@@ -2,19 +2,6 @@
 
 Conversation by [Anthropic Claude3](https://www.anthropic.com/claude)
 
-## Setup
-
-get a API_KEY from [Anthropic Claude3](https://www.anthropic.com/claude)
-
-edit .env
-```
-ANTHROPIC_API_KEY=****
-```
-or set the environment variables
-```
-export ANTHROPIC_API_KEY=****
-```
-
 ## Usage
 
 ```sh
@@ -27,6 +14,19 @@ import { fetchSpeech } from "https://code4fukui.github.io/anthropic-claude3/fetc
 const txt = "今日の調子はどうですか？";
 const res = await fetchConversation(txt);
 console.log(res);
+```
+
+## Setup
+
+get a API_KEY from [Anthropic Claude3](https://www.anthropic.com/claude)
+
+edit .env
+```
+ANTHROPIC_API_KEY=****
+```
+or set the environment variables
+```
+export ANTHROPIC_API_KEY=****
 ```
 
 ## Demo
