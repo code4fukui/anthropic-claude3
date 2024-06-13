@@ -1,10 +1,10 @@
 # anthropic-claude3
 
-Conversation by Anthropic Claude 3
+Conversation by [Anthropic Claude3](https://www.anthropic.com/claude)
 
 ## Setup
 
-get a API_KEY from [OpenAI API](https://www.anthropic.com/claude)
+get a API_KEY from [Anthropic Claude3](https://www.anthropic.com/claude)
 
 edit .env
 ```
