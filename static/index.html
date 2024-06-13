@@ -1,0 +1,197 @@
+
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>AIチャット</title>
+</head><body>
+
+<div id=body>
+
+<h1>AIチャット</h1>
+<!--
+AIの設定
+<select id=selsys>
+  <option value="">AIの設定を変更できます</option>
+  <option>フランクに短く回答してください</option>
+  <option>小学生でもわかるように回答してください</option>
+  <option>大学の教授の用に厳格に堅い文章で回答してください</option>
+  <option>語尾を「にゃん」にしてかわいく、短く回答してください</option>
+  <option value="other">その他（自由に記述してください）</option>
+</select>
+-->
+<button id=btnclear>会話クリア</button>
+モデル <select id=selmodel></select>
+<br>
+<textarea id=sys style="display:none"></textarea>
+<div id=view></div>
+
+</div>
+
+<div id=bottom>
+<form id=form>
+<textarea id=q placeholder="AIへの会話をここに書きます" autocomplete="off"></textarea>
+<input type=submit value="送信"><br>
+<!--<button id=btncls>クリア</button>-->
+</form>
+<a href=https://github.com/code4fukui/anthropic-claude3/>src on GitHub</a> by <a href=https://www.anthropic.com/claude>Claude \ Anthropic</a>
+</div>
+
+
+<script type="module">
+import { fetchJSON } from "https://js.sabae.cc/fetchJSON.js";
+import { sleep } from "https://js.sabae.cc/sleep.js";
+
+const models = [
+  "claude-3-opus-20240229",
+];
+
+for (const model of models) {
+  const op = document.createElement("option");
+  op.textContent = model.split(",")[0];
+  selmodel.appendChild(op);
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const prompt = q.value;
+  if (!prompt) {
+    return;
+  }
+
+  const div = document.createElement("div");
+  div.textContent = prompt;
+  div.className = "user";
+  q.value = "";
+  view.appendChild(div);
+  view.scrollIntoView({ block: "end", behavior: "smooth" });
+
+  const messages = [];
+  let user = true;
+  for (const div of view.children) {
+    const content = div.textContent;
+    if (user) {
+      if (content.startsWith("ところで")) {
+        messages.length = 0;
+      }
+    } else {
+      //if (content.indexOf("いつでもお知らせください。") >= 0 || content.indexOf("なんでもおっしゃってください。") >= 0) {
+      if (content.startsWith("どういたしまして")) {
+        messages.length = 0;
+      }
+    }
+    messages.push({ role: user ? "user" : "assistant", content });
+    user = !user;
+  }
+  //messages.unshift({ "role": "system", "content": sys.value });
+  console.log(messages);
+  
+  const model = selmodel.value;
+  const res = await fetchJSON("/api/conversation", { messages, model });
+  const div2 = document.createElement("div");
+  div2.className = "assistant";
+  const ss = res.split("\n\n");
+  div2.textContent = ss[0];
+  view.appendChild(div2);
+  view.scrollIntoView({ block: "end", behavior: "smooth" });
+  for (let i = 1; i < ss.length; i++) {
+    await sleep(1500);
+    div2.textContent += "\n\n" + ss[i];
+    view.scrollIntoView({ block: "end", behavior: "smooth" });
+  }
+};
+
+/*
+selsys.onchange = () => {
+  if (selsys.value == "other") {
+    sys.value = "";
+    sys.style.display = "block";
+  } else {
+    sys.value = selsys.value;
+    sys.style.display = "none";
+  }
+};
+*/
+btnclear.onclick = () => {
+  view.innerHTML = "";
+};
+</script>
+
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+#body {
+  padding: .5em;
+}
+textarea {
+  font-size: 16px;
+  width: 90vw;
+  height: 5em;
+}
+select {
+  margin-right: .5em;
+}
+#q {
+  padding: .5em .5em;
+  margin: .5em 0 0 0;
+  width: 80%;
+  font-size: 16px;
+  resize: none;
+}
+input[type=submit] {
+  margin: 3em 0;
+  padding: .3em;
+  vertical-align: top;
+}
+.user, .assistant {
+  white-space: pre-wrap;
+  border: 1px solid black;
+  border-radius: .3em;
+  padding: .3em .5em;
+  margin: .3em;
+}
+.user {
+  margin-right: 1.5em;
+  border-bottom-left-radius: 0;
+
+  /*
+  background-color: #5fad56;
+  color: white;
+  */
+  /*
+  background-color: #ff3366;
+  color: white;
+  */
+}
+.assistant {
+  margin-left: 1.5em;
+  border-bottom-right-radius: 0;
+
+  /*
+  background-color: #ff7592;
+  color: white;
+  */
+  /*
+  background-color: #ffff66;
+  color: #000000;
+  */
+}
+#view {
+  padding-bottom: 9.5em;
+
+  /*
+  background-color: #f5f5f5;
+  */
+}
+#bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  padding: .5em;
+  margin: 0;
+  background-color: #f0f0f0;
+}
+a {
+  color: gray !important;
+}
+</style>
+</body></html>
